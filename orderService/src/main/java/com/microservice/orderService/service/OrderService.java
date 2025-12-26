@@ -25,7 +25,7 @@ import java.util.UUID;
 @Slf4j
 public class OrderService {
 
-    private final WebClient webClient;
+    private final WebClient.Builder webClient;
 
     private final OrderRepository orderRepository;
 
@@ -46,8 +46,8 @@ public class OrderService {
 
          System.out.println("making request to inventory service");
          log.info("Making call to inventory");
-         InventoryResponse[] inventoryResponses = webClient.get()
-                 .uri("http://localhost:8083/api/inventory", uriBuilder ->
+         InventoryResponse[] inventoryResponses = webClient.build().get()
+                 .uri("http://INVENTORYSERVICE/api/inventory", uriBuilder ->
                          uriBuilder.queryParam("skuCode", skuCodes).build())
                  .retrieve()
                  .bodyToMono(InventoryResponse[].class)
