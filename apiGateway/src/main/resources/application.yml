@@ -1,0 +1,32 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: APIGATEWAY
+  cloud:
+    gateway:
+      routes:
+        - id: test-httpbin
+          uri: https://httpbin.org
+          predicates:
+            - Path=/test/**
+          filters:
+            - RewritePath=/test/(?<segment>.*), /${segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway,env
+  endpoint:
+    gateway:
+      access: read-only
+
+
+logging:
+  level:
+    org.springframework.boot.context.config: DEBUG
+    org.springframework.cloud.gateway: DEBUG
+
+
