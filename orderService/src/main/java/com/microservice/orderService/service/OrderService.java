@@ -5,11 +5,13 @@ import com.microservice.orderService.config.WebClientConfig;
 import com.microservice.orderService.dto.InventoryResponse;
 import com.microservice.orderService.dto.OrderLineItemsDto;
 import com.microservice.orderService.dto.OrderRequestDto;
+import com.microservice.orderService.events.OrderPlacedEvent;
 import com.microservice.orderService.model.Order;
 import com.microservice.orderService.model.OrderLineItems;
 import com.microservice.orderService.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -26,6 +28,8 @@ import java.util.UUID;
 public class OrderService {
 
     private final WebClient.Builder webClient;
+
+    private final KafkaTemplate<String,OrderPlacedEvent> kafkaTemplate;
 
     private final OrderRepository orderRepository;
 
@@ -59,6 +63,7 @@ public class OrderService {
 
         if(allResponses){
             orderRepository.save(order);
+            kafkaTemplate.send("notificationTopic", new OrderPlacedEvent(order.getOrderNumber()));
         }
         else {
             throw new IllegalArgumentException("Product is not in inventory");

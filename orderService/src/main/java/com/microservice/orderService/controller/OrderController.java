@@ -18,12 +18,13 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = "inventory", fallbackMethod = "fallBack")
-    public String placeOrder(@RequestBody OrderRequestDto orderRequest){
+    public String placeOrder(@RequestBody OrderRequestDto orderRequest) {
         orderService.placeOrder(orderRequest);
         return "Order is placed";
     }
 
-    public String fallBack(OrderRequestDto orderRequestDto, RuntimeException runtimeException){
-        return "Oops! one or moreb services failed";
+    public String fallBack(OrderRequestDto orderRequest, Throwable t) {
+        return "Fallback due to: " + t.getClass().getSimpleName() + " - " + t.getMessage();
     }
+
 }
